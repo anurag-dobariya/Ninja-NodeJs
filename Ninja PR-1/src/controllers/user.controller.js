@@ -1,27 +1,54 @@
-const {userService} = require("../services");
+const {userService , emailService} = require("../services");
 
 /* Create user */
-const createUser = async(req,res) =>{
+// const createUser = async(req,res) =>{
+//     try {
+//         const reqBody = req.body;
+//         const user = await userService.createUser(reqBody);
+
+//         if(!user){
+//             throw new Error("Something went wrong, please try again or later!");
+//         }
+
+//         res.status(200).json({
+//             success:true,
+//             message:"user created successfully",
+//             data:user
+//         })
+//     } catch (error) {
+//         res.status(400).json({
+//             success:false,
+//             message:error.message
+//         });
+//     }
+// };
+
+
+const createUser = async (req, res) => {
     try {
-        const reqBody = req.body;
-        const user = await userService.createUser(reqBody);
+      const reqBody = req.body;
 
-        if(!user){
-            throw new Error("Something went wrong, please try again or later!");
-        }
+      const userExists = await userService.getUserByEmail(reqBody.email);
+      if (userExists) {
+        throw new Error("User already created by this email!");
+      }
 
-        res.status(200).json({
-            success:true,
-            message:"user created successfully",
-            data:user
-        })
+      const user = await userService.createUser(reqBody);
+
+      if (!user) {
+        throw new Error("Something went wrong, please try again or later!");
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "User create successfully!",
+        data: { user },
+      });
     } catch (error) {
-        res.status(400).json({
-            success:false,
-            message:error.message
-        });
+      res.status(400).json({ success: false, message: error.message });
     }
-};
+  };
+
 
 /* get user list */
 const getUserList = async(req,res) =>{
@@ -48,7 +75,6 @@ const deleteUser = async(req,res) =>{
         }
 
         await userService.deleteUser(deleteId);
-        
         res.status(200).json({
             success:true,
             message:"user deleted successfully",
@@ -99,10 +125,33 @@ const updateUser = async (req, res) => {
     }
 };
 
+// send email 
+
+const sendMail = async (req, res) => {
+    try {
+      const reqBody = req.body;
+      const sendEmail = await emailService.sendMail(
+        reqBody.email,
+        reqBody.subject,
+        reqBody.text
+      );
+      if (!sendEmail) {
+        throw new Error("Something went wrong, please try again or later.");
+      }
+
+      res
+        .status(200)
+        .json({ success: true, message: "Email send successfully!" });
+    } catch (error) {
+      res.status(400).json({ success: false, message: error.message });
+    }
+  };
+
 module.exports ={
     createUser,
     getUserList,
     deleteUser,
     getuserById,
-    updateUser
+    updateUser,
+    sendMail
 }

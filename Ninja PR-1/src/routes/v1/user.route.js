@@ -28,7 +28,13 @@ router.delete(
 router.put(
   "/update-user/:userId",
   userController.updateUser
-)
+);
+
+router.post(
+  "/send-mail",
+  userController.sendMail
+);
+
 
 
 module.exports = router;

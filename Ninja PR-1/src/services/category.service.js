@@ -20,7 +20,7 @@ const getCategoryById = async(categoryId)=>{
     return category.findById(categoryId)
 }
 
-// update category details 
+// update category details
 const updateCategory = async(categoryId , updateBody)=>{
     return category.findByIdAndUpdate(categoryId , {$set : updateBody})
 }
